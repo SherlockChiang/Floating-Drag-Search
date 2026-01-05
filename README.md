@@ -23,7 +23,7 @@
 
 1. 克隆或下载本项目代码到本地：
    ```bash
-   git clone [https://github.com/SherlockChiang/Floating-Drag-Search.git](https://github.com/SherlockChiang/Floating-Drag-Search.git)
+   git clone https://github.com/SherlockChiang/Floating-Drag-Search.git
    ```
    打开 Chrome 浏览器，在地址栏输入：chrome://extensions/
 
