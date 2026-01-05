@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Floating Drag Search",
+  "version": "1.1",
+  "description": "悬浮搜索框 (可记忆位置)",
+  "permissions": ["activeTab", "storage"], 
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["style.css"], 
+      "js": ["content.js"]
+    }
+  ]
+}
