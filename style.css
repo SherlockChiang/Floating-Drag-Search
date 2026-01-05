@@ -1,66 +1,104 @@
-/* --- 核心容器 --- */
+/* ============================================================
+   1. 定义颜色变量 (CSS Variables)
+   这里定义了“日间模式”和“夜间模式”的配色方案
+   ============================================================ */
 #my-floating-box {
-  /* 初始定位：网页上方，水平 75% 处 */
+  /* --- 默认：日间模式 (Light Mode) --- */
+  --bg-color: rgba(240, 240, 240, 0.95);      /* 平时背景 */
+  --bg-hover: #ffffff;                        /* 悬停背景 */
+  --text-color: #555555;                      /* 文字颜色 */
+  --border-color: #dddddd;                    /* 边框颜色 */
+  --shadow-color: rgba(0, 0, 0, 0.1);         /* 阴影 */
+  --drag-border: #4285f4;                     /* 拖拽时边框色 */
+  --drag-bg: #f0f7ff;                         /* 拖拽时背景色 */
+  
+  /* 黑色放大镜图标 (SVG URL 编码) */
+  --icon-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+}
+
+/* --- 自动夜间模式 (Dark Mode) --- */
+/* 当系统是深色模式，或者 Dark Reader 强制开启深色时触发 */
+@media (prefers-color-scheme: dark) {
+  #my-floating-box {
+    --bg-color: rgba(40, 40, 40, 0.95);       /* 深灰背景 */
+    --bg-hover: #2b2b2b;                      /* 悬停更黑 */
+    --text-color: #e0e0e0;                    /* 浅灰文字 */
+    --border-color: #555555;                  /* 深色边框 */
+    --shadow-color: rgba(0, 0, 0, 0.5);       /* 更深的阴影 */
+    --drag-border: #669df6;                   /* 拖拽亮蓝 */
+    --drag-bg: #3a4a5e;                       /* 拖拽深蓝背景 */
+
+    /* 白色放大镜图标 (SVG URL 编码: stroke='%23e0e0e0') */
+    --icon-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e0e0e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  }
+}
+
+/* ============================================================
+   2. 核心样式逻辑
+   注意：下面所有的颜色都替换成了 var(--变量名)
+   ============================================================ */
+
+#my-floating-box {
   position: fixed;
   top: 20px;
   left: 75%; 
-  /* 注意：移除之前的 transform: translateX(-50%)，方便 JS 计算坐标 */
   
-  /* 尺寸与外观 */
   width: 300px; 
   height: 50px;
   border-radius: 50px;
   
-  /* 视觉样式 */
+  /* 应用变量 */
   opacity: 0.5;
-  background-color: rgba(240, 240, 240, 0.95);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: var(--bg-color); 
+  box-shadow: 0 2px 8px var(--shadow-color);
+  color: var(--text-color);
   
-  /* 布局 */
   display: flex;
   align-items: center;
   justify-content: center;
   
-  /* 矢量放大镜图标背景 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  /* 应用变量图标 */
+  background-image: var(--icon-image);
   background-repeat: no-repeat;
   background-position: center;
   
-  /* 关键：设置为可抓取手势 */
   cursor: grab; 
   
-  transition: opacity 0.3s, background-color 0.3s, border-radius 0.3s, box-shadow 0.3s;
-  /* 注意：移除了 top/left/transform 的 transition，否则拖拽时会有“延迟飘动”的感觉，不够跟手 */
+  /* 添加 border 属性的过渡，防止夜间模式切换时边框跳变 */
+  border: 1px solid transparent; 
+
+  transition: opacity 0.3s, background-color 0.3s, border-color 0.3s, box-shadow 0.3s, color 0.3s;
   
   font-family: sans-serif;
   z-index: 2147483647;
-  user-select: none; /* 防止拖拽时选中内部文字 */
+  user-select: none;
 }
 
-/* 拖拽中的状态（由 JS 添加类名） */
+/* 拖拽中状态 */
 #my-floating-box.is-dragging {
-  cursor: grabbing; /* 抓紧的手势 */
+  cursor: grabbing;
   opacity: 0.9;
-  transition: none; /* 拖拽时完全移除过渡，确保绝对跟手 */
+  transition: none;
 }
 
-/* --- 交互状态：鼠标悬停 或 拖拽文字进入 --- */
+/* 交互状态：悬停 或 拖拽进入 */
 #my-floating-box:hover,
 #my-floating-box.drag-over {
   opacity: 1.0;
-  background-color: #fff;
+  background-color: var(--bg-hover); /* 变色 */
   background-image: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  border: 1px solid #ddd;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  border: 1px solid var(--border-color); /* 变色 */
 }
 
+/* 拖拽文字进入时的特殊高亮 */
 #my-floating-box.drag-over {
-  border: 2px dashed #4285f4;
-  background-color: #f0f7ff;
+  border: 2px dashed var(--drag-border);
+  background-color: var(--drag-bg);
   transform: scale(1.05);
 }
 
-/* --- 内部引擎选择器 --- */
+/* 内部引擎选择器 */
 .engine-selector {
   display: flex;
   justify-content: space-around;
@@ -80,15 +118,16 @@
   pointer-events: auto;
 }
 
+/* 单选按钮文字 */
 .engine-label {
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #555;
+  color: var(--text-color); /* 变色 */
 }
 
 .engine-label:hover {
-  color: #4285f4;
+  color: #4285f4; /* 悬停保持蓝色，比较醒目，不需要变 */
 }
