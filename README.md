@@ -44,9 +44,13 @@
 
 ## 📂 项目结构 (Structure)
 .
+
 ├── manifest.json   # 插件配置文件 (Manifest V3)
+
 ├── content.js      # 核心逻辑：DOM注入、拖拽事件、位置同步
+
 ├── style.css       # 样式文件：悬浮框UI、过渡动画
+
 └── README.md       # 项目文档
 ## 🚀 待办清单 & 社区贡献 (Roadmap & Contribution)
 这是一个基础版本，非常欢迎社区开发者提交 PR 来改进它！以下是一些改进思路：
